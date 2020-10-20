@@ -44,9 +44,9 @@ def coef_bas(lst):
     return [x, r, n, w, z, s]
 
 
-def potentials(elem_symbol, data, T=298.15, conc_ion=1, pH=0):
-    R = 8.3144598
-    F = 96485.33289
+def potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=0):
+    gas_constant = 8.3144598
+    faraday_constant = 96485.33289
 
     df = data.filter(like=elem_symbol).dropna(how='all')
 
@@ -77,7 +77,7 @@ def potentials(elem_symbol, data, T=298.15, conc_ion=1, pH=0):
                 w = 0
             if df_acid[acid_state][i] == '(s)' or df_acid[acid_state][i] == '(l)':
                 x = 0
-            nernst = ((R * T) / (n * F)) * np.log((conc_ion) ** w / (conc_ion ** x * hydronium ** y))
+            nernst = ((gas_constant * temperature) / (n * faraday_constant)) * np.log((conc_ion) ** w / (conc_ion ** x * hydronium ** y))
             E0_ac = df_acid[acid + '_E0'][i]
             E_ac.append(E0_ac + nernst)
 
@@ -91,7 +91,7 @@ def potentials(elem_symbol, data, T=298.15, conc_ion=1, pH=0):
                 w = 0
             if df_basic[basic_state][i] == '(s)' or df_basic[basic_state][i] == '(l)':
                 x = 0
-            nernst = ((R * T) / (n * F)) * np.log(((conc_ion ** w) * (hydroxide ** s)) / (conc_ion ** x))
+            nernst = ((gas_constant * temperature) / (n * faraday_constant)) * np.log(((conc_ion ** w) * (hydroxide ** s)) / (conc_ion ** x))
             E0_bas = df_basic[basic + '_E0'][i]
             E_bas.append(E0_bas + nernst)
 
@@ -167,7 +167,7 @@ def plot_param(ax=None):
 
 def plot_frost(elem_symbol, data, ax=None, ac_xmove=0, ac_ymove=-0.05,
                bas_xmove=0, bas_ymove=-0.05, xbbox=1.2, ybbox=0.5, label=True,
-               plotboth=True, pH=0, conc_ion=1, T=298.15, legend=True):
+               plotboth=True, pH=0, conc_ion=1, temperature=298.15, legend=True):
     plot_param(ax)
 
     acid, basic, acid_state, basic_state, acid_label, basic_label, acid_bal, \
@@ -177,17 +177,17 @@ def plot_frost(elem_symbol, data, ax=None, ac_xmove=0, ac_ymove=-0.05,
         if plotboth:
             pH = 0
             conc_ion = 1
-            df = potentials(elem_symbol, data, T=298.15, conc_ion=conc_ion, pH=pH)
+            df = potentials(elem_symbol, data, temperature=298.15, conc_ion=conc_ion, pH=pH)
             ax.plot(df.index, df[acid], linewidth=3,
                     label='$\mathrm{{pH = {{{0}}}, [ions] = {{{1:1.1f}}} \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
                     color="blue", marker='o', markersize=7)
         else:
-            df = potentials(elem_symbol, data, T=298.15, conc_ion=1, pH=0)
+            df = potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=0)
             ax.plot(df.index, df[acid], linewidth=3,
                     label='$\mathrm{{pH = 0, [ions] = 1 \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
                     color="blue", marker='o', markersize=7, linestyle='-.')
-            if pH != 0 or conc_ion != 1 or T != 298.15:
-                df = potentials(elem_symbol, data, T=T, conc_ion=conc_ion, pH=pH)
+            if pH != 0 or conc_ion != 1 or temperature != 298.15:
+                df = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=pH)
                 ax.plot(df.index, df[acid_new], linewidth=3,
                         label='$\mathrm{{pH = {{{0}}}, [ions] = {{{1:1.1e}}} \, mol \cdot L^{{-1}}}}$'.format(pH,
                                                                                                               conc_ion),
@@ -205,17 +205,17 @@ def plot_frost(elem_symbol, data, ax=None, ac_xmove=0, ac_ymove=-0.05,
         if plotboth:
             pH = 14
             conc_ion = 1
-            df = potentials(elem_symbol, data, T=298.15, conc_ion=conc_ion, pH=pH)
+            df = potentials(elem_symbol, data, temperature=298.15, conc_ion=conc_ion, pH=pH)
             ax.plot(df.index, df[basic], linewidth=3,
                     label='$\mathrm{{pH = {{{0}}}, [ions] = {{{1:1.1f}}} \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
                     color="red", marker='s', markersize=7, linestyle='-.')
         else:
-            df = potentials(elem_symbol, data, T=298.15, conc_ion=1, pH=14)
+            df = potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=14)
             ax.plot(df.index, df[basic], linewidth=3,
                     label='$\mathrm{{pH = 14, [ions] = 1 \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
                     color="red", marker='o', markersize=7, linestyle='-.')
-            if pH != 14 or conc_ion != 1 or T != 298.15:
-                df = potentials(elem_symbol, data, T=T, conc_ion=conc_ion, pH=pH)
+            if pH != 14 or conc_ion != 1 or temperature != 298.15:
+                df = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=pH)
                 ax.plot(df.index, df[basic_new], linewidth=3,
                         label='$\mathrm{{pH = {{{0}}}, [ions] = {{{1:1.1e}}} \, mol \cdot L^{{-1}}}}$'.format(pH,
                                                                                                               conc_ion),
