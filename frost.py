@@ -18,9 +18,9 @@ def labels_df(elem_symbol):
     basic_E = basic + '_E'
     acid_new = acid + '_new'
     basic_new = basic + '_new'
-    return [acid, basic, acid_state, basic_state, acid_label, basic_label,
+    return (acid, basic, acid_state, basic_state, acid_label, basic_label,
             acid_bal, basic_bal, acid_E0, basic_E0, acid_E, basic_E, acid_new,
-            basic_new]
+            basic_new)
 
 
 def coef_ac(lst):
@@ -51,7 +51,7 @@ def potentials(elem_symbol, data, T=298.15, conc_ion=1, pH=0):
     df = data.filter(like=elem_symbol).dropna(how='all')
 
     acid, basic, acid_state, basic_state, acid_label, basic_label, acid_bal, \
-    basic_bal = labels_df(elem_symbol)[:8]
+        basic_bal = labels_df(elem_symbol)[:8]
 
     df[acid + '_E0'] = np.where(df[acid] != 0, df[acid] / df[acid].index, 0)
     df[basic + '_E0'] = np.where(df[basic] != 0, df[basic] / df[basic].index, 0)
@@ -171,7 +171,7 @@ def plot_frost(elem_symbol, data, ax=None, ac_xmove=0, ac_ymove=-0.05,
     plot_param(ax)
 
     acid, basic, acid_state, basic_state, acid_label, basic_label, acid_bal, \
-    basic_bal, acid_E0, basic_E0, acid_E, basic_E, acid_new, basic_new = labels_df(elem_symbol)
+        basic_bal, acid_E0, basic_E0, acid_E, basic_E, acid_new, basic_new = labels_df(elem_symbol)
 
     if pH <= 7 or plotboth:
         if plotboth:
