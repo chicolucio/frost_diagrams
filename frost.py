@@ -3,65 +3,6 @@ import numpy as np
 from ast import literal_eval
 
 
-def get_text_positions(x_data, y_data, txt_width, txt_height):
-    # code from https://stackoverflow.com/questions/8850142/matplotlib-overlapping-annotations/10739207
-    a = zip(y_data, x_data)
-    text_positions = y_data.copy()
-    for index, (y, x) in enumerate(a):
-        local_text_positions = [i for i in a if i[0] > (y - txt_height)
-                                and (abs(i[1] - x) < txt_width * 2) and i != (y, x)]
-        if local_text_positions:
-            sorted_ltp = sorted(local_text_positions)
-            if abs(sorted_ltp[0][0] - y) < txt_height:  # True == collision
-                differ = np.diff(sorted_ltp, axis=0)
-                a[index] = (sorted_ltp[-1][0] + txt_height, a[index][1])
-                text_positions[index] = sorted_ltp[-1][0] + txt_height
-                for k, (j, m) in enumerate(differ):
-                    # j is the vertical distance between words
-                    if j > txt_height * 2:  # if True then room to fit a word in
-                        a[index] = (sorted_ltp[k][0] + txt_height, a[index][1])
-                        text_positions[index] = sorted_ltp[k][0] + txt_height
-                        break
-    return text_positions
-
-
-def text_plotter(x_data, y_data, label, text_positions, axis, txt_width,
-                 txt_height, solution, xmove=0, ymove=-0.05):
-    # adapted from https://stackoverflow.com/questions/8850142/matplotlib-overlapping-annotations/10739207
-    if solution == 'acid':
-        color = 'blue'
-        facecolor = 'dodgerblue'
-    else:
-        color = 'red'
-        facecolor = 'darkorange'
-
-    for x, y, l, t in zip(x_data, y_data, label, text_positions):
-        axis.text(x + txt_width + xmove, t + ymove, '$\mathrm{{{0}}}$'.format(label[x]),
-                  rotation=0, color=color, fontsize=20,
-                  bbox=dict(facecolor=facecolor, alpha=0.1))
-        if y != t:
-            axis.arrow(x, t, 0, y - t, color='red', alpha=0.3, width=txt_width * 0.1,
-                       head_width=txt_width, head_length=txt_height * 0.5,
-                       zorder=0, length_includes_head=True)
-
-
-def plot_param(ax=None):
-    ax.axhline(color='gray', zorder=-1)
-    ax.axvline(color='gray', zorder=-1)
-    ax.grid(b=True, which='major', linestyle=':', linewidth=2)
-    ax.minorticks_on()
-    ax.grid(b=True, which='minor', axis='y', linestyle=':', linewidth=1.0)
-    ax.tick_params(which='both', labelsize=16)
-    ax.tick_params(which='minor', axis='x', bottom=False)
-    ax.set_aspect('equal')  # so that no scale adjust is needed
-    ax.set_xlabel('Oxidation number', size=18)
-    ax.set_ylabel(r'$\Delta G/F$', size=18)
-    ax.tick_params(axis='both', length=6, which='major', width=1.5)
-    ax.tick_params(axis='both', length=3, which='minor', width=1.0)
-    for axis in ['top', 'bottom', 'left', 'right']:
-        ax.spines[axis].set_linewidth(1.5)
-
-
 def labels_df(elem_symbol):
     acid = elem_symbol + '_acid'
     basic = elem_symbol + '_basic'
@@ -163,6 +104,65 @@ def potentials(elem_symbol, data, T=298.15, conc_ion=1, pH=0):
     if pH <= 7:
         return df_acid
     return df_basic
+
+
+def get_text_positions(x_data, y_data, txt_width, txt_height):
+    # code from https://stackoverflow.com/questions/8850142/matplotlib-overlapping-annotations/10739207
+    a = zip(y_data, x_data)
+    text_positions = y_data.copy()
+    for index, (y, x) in enumerate(a):
+        local_text_positions = [i for i in a if i[0] > (y - txt_height)
+                                and (abs(i[1] - x) < txt_width * 2) and i != (y, x)]
+        if local_text_positions:
+            sorted_ltp = sorted(local_text_positions)
+            if abs(sorted_ltp[0][0] - y) < txt_height:  # True == collision
+                differ = np.diff(sorted_ltp, axis=0)
+                a[index] = (sorted_ltp[-1][0] + txt_height, a[index][1])
+                text_positions[index] = sorted_ltp[-1][0] + txt_height
+                for k, (j, m) in enumerate(differ):
+                    # j is the vertical distance between words
+                    if j > txt_height * 2:  # if True then room to fit a word in
+                        a[index] = (sorted_ltp[k][0] + txt_height, a[index][1])
+                        text_positions[index] = sorted_ltp[k][0] + txt_height
+                        break
+    return text_positions
+
+
+def text_plotter(x_data, y_data, label, text_positions, axis, txt_width,
+                 txt_height, solution, xmove=0, ymove=-0.05):
+    # adapted from https://stackoverflow.com/questions/8850142/matplotlib-overlapping-annotations/10739207
+    if solution == 'acid':
+        color = 'blue'
+        facecolor = 'dodgerblue'
+    else:
+        color = 'red'
+        facecolor = 'darkorange'
+
+    for x, y, l, t in zip(x_data, y_data, label, text_positions):
+        axis.text(x + txt_width + xmove, t + ymove, '$\mathrm{{{0}}}$'.format(label[x]),
+                  rotation=0, color=color, fontsize=20,
+                  bbox=dict(facecolor=facecolor, alpha=0.1))
+        if y != t:
+            axis.arrow(x, t, 0, y - t, color='red', alpha=0.3, width=txt_width * 0.1,
+                       head_width=txt_width, head_length=txt_height * 0.5,
+                       zorder=0, length_includes_head=True)
+
+
+def plot_param(ax=None):
+    ax.axhline(color='gray', zorder=-1)
+    ax.axvline(color='gray', zorder=-1)
+    ax.grid(b=True, which='major', linestyle=':', linewidth=2)
+    ax.minorticks_on()
+    ax.grid(b=True, which='minor', axis='y', linestyle=':', linewidth=1.0)
+    ax.tick_params(which='both', labelsize=16)
+    ax.tick_params(which='minor', axis='x', bottom=False)
+    ax.set_aspect('equal')  # so that no scale adjust is needed
+    ax.set_xlabel('Oxidation number', size=18)
+    ax.set_ylabel(r'$\Delta G/F$', size=18)
+    ax.tick_params(axis='both', length=6, which='major', width=1.5)
+    ax.tick_params(axis='both', length=3, which='minor', width=1.0)
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax.spines[axis].set_linewidth(1.5)
 
 
 def plot_frost(elem_symbol, data, ax=None, ac_xmove=0, ac_ymove=-0.05,
