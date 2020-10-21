@@ -139,7 +139,7 @@ def text_plotter(x_data, y_data, label, text_positions, axis, txt_width,
         facecolor = 'darkorange'
 
     for x, y, l, t in zip(x_data, y_data, label, text_positions):
-        axis.text(x + txt_width + xmove, t + ymove, '$\mathrm{{{0}}}$'.format(label[x]),
+        axis.text(x + txt_width + xmove, t + ymove, fr'$\mathrm{{{label[x]}}}$',
                   rotation=0, color=color, fontsize=20,
                   bbox=dict(facecolor=facecolor, alpha=0.1))
         if y != t:
@@ -179,18 +179,17 @@ def plot_frost(elem_symbol, data, ax=None, ac_xmove=0, ac_ymove=-0.05,
             conc_ion = 1
             df = potentials(elem_symbol, data, temperature=298.15, conc_ion=conc_ion, pH=pH)
             ax.plot(df.index, df[acid], linewidth=3,
-                    label='$\mathrm{{pH = {{{0}}}, [ions] = {{{1:1.1f}}} \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
+                    label=fr'$\mathrm{{pH = {pH}, [ions] = {conc_ion:1.1f} \, mol \cdot L^{{-1}}}}$',
                     color="blue", marker='o', markersize=7)
         else:
             df = potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=0)
             ax.plot(df.index, df[acid], linewidth=3,
-                    label='$\mathrm{{pH = 0, [ions] = 1 \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
+                    label=r'$\mathrm{{pH = 0, [ions] = 1 \, mol \cdot L^{{-1}}}}$',
                     color="blue", marker='o', markersize=7, linestyle='-.')
             if pH != 0 or conc_ion != 1 or temperature != 298.15:
                 df = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=pH)
                 ax.plot(df.index, df[acid_new], linewidth=3,
-                        label='$\mathrm{{pH = {{{0}}}, [ions] = {{{1:1.1e}}} \, mol \cdot L^{{-1}}}}$'.format(pH,
-                                                                                                              conc_ion),
+                        label=fr'$\mathrm{{pH = {pH}, [ions] = {{{conc_ion:1.1E}}} \, mol \cdot L^{{-1}}}}$',
                         color="cyan", marker='s', markersize=7)
 
         if label:
@@ -207,18 +206,17 @@ def plot_frost(elem_symbol, data, ax=None, ac_xmove=0, ac_ymove=-0.05,
             conc_ion = 1
             df = potentials(elem_symbol, data, temperature=298.15, conc_ion=conc_ion, pH=pH)
             ax.plot(df.index, df[basic], linewidth=3,
-                    label='$\mathrm{{pH = {{{0}}}, [ions] = {{{1:1.1f}}} \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
+                    label=fr'$\mathrm{{pH = {pH}, [ions] = {conc_ion:1.1f} \, mol \cdot L^{{-1}}}}$',
                     color="red", marker='s', markersize=7, linestyle='-.')
         else:
             df = potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=14)
             ax.plot(df.index, df[basic], linewidth=3,
-                    label='$\mathrm{{pH = 14, [ions] = 1 \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
+                    label=r'$\mathrm{{pH = 14, [ions] = 1 \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
                     color="red", marker='o', markersize=7, linestyle='-.')
             if pH != 14 or conc_ion != 1 or temperature != 298.15:
                 df = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=pH)
                 ax.plot(df.index, df[basic_new], linewidth=3,
-                        label='$\mathrm{{pH = {{{0}}}, [ions] = {{{1:1.1e}}} \, mol \cdot L^{{-1}}}}$'.format(pH,
-                                                                                                              conc_ion),
+                        label=fr'$\mathrm{{pH = {pH}, [ions] = {conc_ion:1.1E} \, mol \cdot L^{{-1}}}}$',
                         color="orange", marker='s', markersize=7)
 
         if label:
