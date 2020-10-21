@@ -165,67 +165,79 @@ def plot_param(ax=None):
         ax.spines[axis].set_linewidth(1.5)
 
 
+def _standard_curves(elem_symbol, data, solution=None, ax=None):
+    conc_ion = 1
+    temperature = 298.15
+
+    acid, basic, acid_state, basic_state, acid_label, basic_label, acid_bal, \
+        basic_bal, acid_E0, basic_E0, acid_E, basic_E, acid_new, basic_new = labels_df(elem_symbol)
+
+    df_acid = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=0)
+    df_basic = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=14)
+    acid_plot = {'linewidth' : 3,
+                 'label' : fr'$\mathrm{{pH = 0, [ions] = {conc_ion:1.1f} \, mol \cdot L^{{-1}}}}$',
+                 'color' : "blue",
+                 'marker' : 'o',
+                 'markersize' : 7,}
+    basic_plot ={'linewidth' : 3,
+                 'label' : fr'$\mathrm{{pH = 14, [ions] = {conc_ion:1.1f} \, mol \cdot L^{{-1}}}}$',
+                 'color' : "red",
+                 'marker' : 's',
+                 'markersize' : 7,
+                 'linestyle' : '-.'}
+
+    if solution == 'both':
+        ax.plot(df_acid.index, df_acid[acid],  **acid_plot)
+        ax.plot(df_basic.index, df_basic[basic], **basic_plot)
+    elif solution == 'acid':
+        ax.plot(df_acid.index, df_acid[acid], **acid_plot)
+    elif solution == 'basic':
+        ax.plot(df_basic.index, df_basic[basic], **basic_plot)
+    else:
+        raise ValueError('Solution must be acid, basic or both')
+
+
 def plot_frost(elem_symbol, data, ax=None, ac_xmove=0, ac_ymove=-0.05,
                bas_xmove=0, bas_ymove=-0.05, xbbox=1.2, ybbox=0.5, label=True,
-               plotboth=True, pH=0, conc_ion=1, temperature=298.15, legend=True):
+               plot_both=True, pH=0, conc_ion=1, temperature=298.15, legend=True):
     plot_param(ax)
 
     acid, basic, acid_state, basic_state, acid_label, basic_label, acid_bal, \
         basic_bal, acid_E0, basic_E0, acid_E, basic_E, acid_new, basic_new = labels_df(elem_symbol)
 
-    if pH <= 7 or plotboth:
-        if plotboth:
-            pH = 0
-            conc_ion = 1
-            df = potentials(elem_symbol, data, temperature=298.15, conc_ion=conc_ion, pH=pH)
-            ax.plot(df.index, df[acid], linewidth=3,
-                    label=fr'$\mathrm{{pH = {pH}, [ions] = {conc_ion:1.1f} \, mol \cdot L^{{-1}}}}$',
-                    color="blue", marker='o', markersize=7)
-        else:
-            df = potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=0)
-            ax.plot(df.index, df[acid], linewidth=3,
-                    label=r'$\mathrm{{pH = 0, [ions] = 1 \, mol \cdot L^{{-1}}}}$',
-                    color="blue", marker='o', markersize=7, linestyle='-.')
-            if pH != 0 or conc_ion != 1 or temperature != 298.15:
-                df = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=pH)
-                ax.plot(df.index, df[acid_new], linewidth=3,
-                        label=fr'$\mathrm{{pH = {pH}, [ions] = {{{conc_ion:1.1E}}} \, mol \cdot L^{{-1}}}}$',
-                        color="cyan", marker='s', markersize=7)
+    if plot_both:
+        _standard_curves(elem_symbol, data, solution='both', ax=ax)
 
-        if label:
-            txt_height = 0.04 * (ax.get_ylim()[1] - ax.get_ylim()[0])
-            txt_width = 0.03 * (ax.get_ylim()[1] - ax.get_ylim()[0])
+    elif pH <= 7:
+        _standard_curves(elem_symbol, data, solution='acid', ax=ax)
 
-            text_positions = get_text_positions(df.index, df[acid], txt_width, txt_height)
-            text_plotter(df.index, df[acid], df[acid_label], text_positions,
-                         ax, txt_width, txt_height, 'acid', xmove=ac_xmove, ymove=ac_ymove)
+        if pH != 0 or conc_ion != 1 or temperature != 298.15:
+            df = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=pH)
+            ax.plot(df.index, df[acid_new], linewidth=3,
+                    label=fr'$\mathrm{{pH = {pH}, [ions] = {{{conc_ion:1.1E}}} \, mol \cdot L^{{-1}}}}$',
+                    color="cyan", marker='s', markersize=7)
 
-    if pH >= 7 or plotboth:
-        if plotboth:
-            pH = 14
-            conc_ion = 1
-            df = potentials(elem_symbol, data, temperature=298.15, conc_ion=conc_ion, pH=pH)
-            ax.plot(df.index, df[basic], linewidth=3,
-                    label=fr'$\mathrm{{pH = {pH}, [ions] = {conc_ion:1.1f} \, mol \cdot L^{{-1}}}}$',
-                    color="red", marker='s', markersize=7, linestyle='-.')
-        else:
-            df = potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=14)
-            ax.plot(df.index, df[basic], linewidth=3,
-                    label=r'$\mathrm{{pH = 14, [ions] = 1 \, mol \cdot L^{{-1}}}}$'.format(pH, conc_ion),
-                    color="red", marker='o', markersize=7, linestyle='-.')
-            if pH != 14 or conc_ion != 1 or temperature != 298.15:
-                df = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=pH)
-                ax.plot(df.index, df[basic_new], linewidth=3,
-                        label=fr'$\mathrm{{pH = {pH}, [ions] = {conc_ion:1.1E} \, mol \cdot L^{{-1}}}}$',
-                        color="orange", marker='s', markersize=7)
+    elif pH >= 7:
+        _standard_curves(elem_symbol, data, solution='basic', ax=ax)
+        if pH != 14 or conc_ion != 1 or temperature != 298.15:
+            df = potentials(elem_symbol, data, temperature=temperature, conc_ion=conc_ion, pH=pH)
+            ax.plot(df.index, df[basic_new], linewidth=3,
+                    label=fr'$\mathrm{{pH = {pH}, [ions] = {conc_ion:1.1E} \, mol \cdot L^{{-1}}}}$',
+                    color="orange", marker='s', markersize=7)
 
-        if label:
-            txt_height = 0.04 * (ax.get_ylim()[1] - ax.get_ylim()[0])
-            txt_width = 0.03 * (ax.get_ylim()[1] - ax.get_ylim()[0])
-
-            text_positions = get_text_positions(df.index, df[basic], txt_width, txt_height)
-            text_plotter(df.index, df[basic], df[basic_label], text_positions,
-                         ax, txt_width, txt_height, 'basic', xmove=bas_xmove, ymove=bas_ymove)
+    if label:
+        # TODO: fix species labels
+        # txt_height = 0.04 * (ax.get_ylim()[1] - ax.get_ylim()[0])
+        # txt_width = 0.03 * (ax.get_ylim()[1] - ax.get_ylim()[0])
+        #
+        # text_positions = get_text_positions(df.index, df[acid], txt_width, txt_height)
+        # text_plotter(df.index, df[acid], df[acid_label], text_positions,
+        #              ax, txt_width, txt_height, 'acid', xmove=ac_xmove, ymove=ac_ymove)
+        #
+        # text_positions = get_text_positions(df.index, df[basic], txt_width, txt_height)
+        # text_plotter(df.index, df[basic], df[basic_label], text_positions,
+        #              ax, txt_width, txt_height, 'basic', xmove=bas_xmove, ymove=bas_ymove)
+        pass
 
     if legend:
         ax.legend(fontsize=14, loc='upper center', shadow=True, fancybox=True,
