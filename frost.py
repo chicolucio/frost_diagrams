@@ -108,7 +108,7 @@ def potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=0):
 
 def get_text_positions(x_data, y_data, txt_width, txt_height):
     # code from https://stackoverflow.com/questions/8850142/matplotlib-overlapping-annotations/10739207
-    a = zip(y_data, x_data)
+    a = list(zip(y_data, x_data))
     text_positions = y_data.copy()
     for index, (y, x) in enumerate(a):
         local_text_positions = [i for i in a if i[0] > (y - txt_height)
