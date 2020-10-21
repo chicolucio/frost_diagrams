@@ -57,11 +57,11 @@ def potentials(elem_symbol, data, temperature=298.15, conc_ion=1, pH=0):
     df[basic + '_E0'] = np.where(df[basic] != 0, df[basic] / df[basic].index, 0)
 
     acid_mask = pd.notnull(df[acid_bal])
-    df_acid = df.filter(like=acid).dropna(how='all')[acid_mask]
+    df_acid = df.filter(like=acid)[acid_mask]
     df_acid[acid_bal] = df_acid[acid_bal].apply(literal_eval)
 
     basic_mask = pd.notnull(df[basic_bal])
-    df_basic = df.filter(like=basic).dropna(how='all')[basic_mask]
+    df_basic = df.filter(like=basic)[basic_mask]
     df_basic[basic_bal] = df_basic[basic_bal].apply(literal_eval)
 
     hydronium = 10 ** (-pH)
