@@ -2,7 +2,7 @@
 
 ![frost_interactive](frost_interactive.gif)
 
-Module to plot Frost diagrams. Interactive plots can also be made following [the tutorial](tutorial.ipynb) instructions. An interactive Colab notebook can also be used <a href="https://colab.research.google.com/github/chicolucio/frost_diagrams/blob/colab/colab/interactive_colab.ipynb" target="_blank">
+Module to plot Frost diagrams. Interactive plots can also be made following [the tutorial](tutorial.ipynb) instructions. An interactive Colab notebook can also be used <a href="https://colab.research.google.com/github/chicolucio/frost_diagrams/blob/main/colab/interactive_colab.ipynb" target="_blank">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
