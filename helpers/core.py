@@ -17,22 +17,22 @@ def columns_df(elem_symbol):
     return column_names
 
 
-def coef_ac(lst):
-    a, b, c, d, m = lst[:]
+def coef_ac(iterable):
+    a, b, c, d, m = iterable
     x = 1
     z = c
     w = b / d
     y = 2 * z - a
     n = m + y
-    return [x, y, n, w, z]
+    return (x, y, n, w, z)
 
 
-def coef_bas(lst):
-    a, b, c, d, m = lst[:]
+def coef_bas(iterable):
+    a, b, c, d, m = iterable
     x = 1
     w = b / d
     z = c
     r = 2 * z - a
     s = r
     n = m + s
-    return [x, r, n, w, z, s]
+    return (x, r, n, w, z, s)
