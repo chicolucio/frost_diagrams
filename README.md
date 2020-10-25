@@ -1,4 +1,4 @@
-# Reversible reactions of the first order
+# Frost diagrams
 
 ![frost_interactive](frost_interactive.gif)
 
